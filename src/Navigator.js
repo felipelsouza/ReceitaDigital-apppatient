@@ -3,6 +3,8 @@ import { createAppContainer, createSwitchNavigator } from 'react-navigation'
 import Home from './screens/Home'
 import Pharmacies from './screens/Pharmacies'
 import Recipes from './screens/Recipes'
+import Login from './screens/Login'
+import Register from './screens/Register'
 
 const mainRoutes = {
     Home: {
@@ -16,11 +18,19 @@ const mainRoutes = {
     Recipes: {
         name: 'Recipes',
         screen: Recipes
+    },
+    Login: {
+        name: 'Login',
+        screen: Login
+    },
+    Register: {
+        name: 'Register',
+        screen: Register
     }
 }
 
 const mainNavigator = createSwitchNavigator(mainRoutes, {
-    initialRouteName: 'Home'
+    initialRouteName: 'Recipes'
 })
 
 export default createAppContainer(mainNavigator, mainRoutes)
