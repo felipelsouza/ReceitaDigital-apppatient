@@ -1,5 +1,12 @@
 import React, { Component } from 'react'
-import { Text, View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native'
+import {
+    Text,
+    View,
+    StyleSheet,
+    ScrollView,
+    TouchableOpacity,
+    FlatList
+} from 'react-native'
 
 import Swiper from 'react-native-swiper'
 
@@ -12,9 +19,9 @@ import 'moment/locale/pt-br'
 import api from '../services/api'
 
 const initialState = {
-    medicaments: null,
-    dosages: null,
-    obs: null,
+    medicaments: '',
+    dosages: [],
+    obs: [],
 }
 
 export default class Recipes extends Component {
@@ -24,12 +31,13 @@ export default class Recipes extends Component {
     }
 
     async componentDidMount() {
-        await api.get('/receitas/10765536641')
+        await api.get('/receitasPaciente/88888888888')
             .then(res => this.setState({ recipes: res.data }))
+
         const arr = this.state.recipes
 
         var meds = arr.map((function (meds) {
-            return meds.MEDICAMENTO_RECEITA
+            return JSON.parse(meds.MEDICAMENTO_RECEITA)
         }))
 
         var dos = arr.map((function (dos) {
@@ -45,21 +53,15 @@ export default class Recipes extends Component {
 
     renderRecipes() {
         const { recipes, medicaments, dosages, obs } = this.state
-        const today = moment().locale('pt-br').format('DD/MM/YYYY')
+
+        //const med = `${medicaments}`
+        //var medList = med.replace(/,/g, "\n")
+
+        //console.log(medList)
 
         if (recipes.length === 0) {
             return (
                 <View style={styles.container}>
-                    <View style={styles.header}>
-                        <TouchableOpacity style={styles.addIcon} activeOpacity={0.8}
-                            onPress={() => this.props.navigation.navigate('Home')}>
-                            <Icon name="angle-left" size={15}
-                                color={commonStyles.colors.secondary}
-                            />
-                        </TouchableOpacity>
-                        <Text style={styles.title}>Receita Digital</Text>
-                        <Text style={styles.title}>{today}</Text>
-                    </View>
                     <View
                         style={
                             styles.body,
@@ -83,6 +85,47 @@ export default class Recipes extends Component {
         }
 
         return (
+            <View style={{ flex: 4 }}>
+                <Swiper style={styles.body} showsButtons={true} key={Math.random()}>
+                    {recipes.map((meds) => (
+                        <View key={Math.random()}>
+                            <View style={{flexDirection: 'row', marginBottom: 20}}>
+                                <Text style={styles.title}>Vencimento da Receita:</Text>
+                                <Text key={Math.random()} style={styles.title}>
+                                    {moment(meds.DATA_RECEITA).locale('pt-br').format('DD/MM/YYYY')}
+                                    </Text>
+                            </View>
+                            <View>
+                                <Text style={styles.title}>Medicamentos:</Text>
+                                <ScrollView style={[styles.textArea, { height: 50 }]}>
+                                    <Text key={Math.random()}>{meds.MEDICAMENTO_RECEITA}</Text>
+                                </ScrollView>
+                            </View>
+                            <View>
+                                <Text style={styles.title}>Dosagens:</Text>
+                                <ScrollView style={[styles.textArea, { height: 80 }]}>
+                                    <Text key={Math.random()}>{meds.DOSAGEM}</Text>
+                                </ScrollView>
+                            </View>
+                            <View>
+                                <Text style={styles.title}>Observações:</Text>
+                                <ScrollView style={[styles.textArea, { height: 80 }]}>
+                                    <Text key={Math.random()}>{meds.OBS_RECEITA_PACIENTE}</Text>
+                                </ScrollView>
+                            </View>
+                        </View>
+                    ))}
+                </Swiper >
+            </View>
+
+        )
+
+    }
+
+    render() {
+        const today = moment().locale('pt-br').format('DD/MM/YYYY')
+
+        return (
             <View style={styles.container}>
                 <View style={styles.header}>
                     <TouchableOpacity style={styles.addIcon} activeOpacity={0.8}
@@ -94,26 +137,10 @@ export default class Recipes extends Component {
                     <Text style={styles.title}>Receita Digital</Text>
                     <Text style={styles.title}>{today}</Text>
                 </View>
-                <View style={styles.body}>
-                    <View>
-                        <ScrollView>
-                            <Text>{medicaments}</Text>
-                            <Text>{dosages}</Text>
-                            <Text>{obs}</Text>
-                        </ScrollView>
-                    </View>
+                <View style={{ height: '90%' }}>
+                    {this.renderRecipes()}
                 </View>
-            </View >
-        )
-
-    }
-
-    render() {
-
-        return (
-            <Swiper style={styles.wrapper} showsButtons={true}>
-                {this.renderRecipes()}
-            </Swiper>
+            </View>
         )
     }
 }
@@ -132,11 +159,12 @@ const styles = StyleSheet.create({
     },
     body: {
         //flex: 10,
-        padding: '10%'
+        padding: '5%'
     },
     title: {
         fontWeight: 'bold',
         color: commonStyles.colors.primary,
+        marginHorizontal: 16,
         fontSize: 15
     },
     emptyData: {
@@ -153,4 +181,14 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center'
     },
+    textArea: {
+        borderWidth: 1,
+        borderColor: commonStyles.colors.primary,
+        borderRadius: 10,
+        marginHorizontal: 16,
+        marginBottom: 7,
+        //justifyContent: 'center',
+        padding: 5,
+        width: '80%'
+    }
 })
