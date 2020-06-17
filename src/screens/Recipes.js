@@ -18,16 +18,11 @@ import 'moment/locale/pt-br'
 
 import api from '../services/api'
 
-const initialState = {
-    medicaments: '',
-    dosages: [],
-    obs: [],
-}
-
 export default class Recipes extends Component {
     state = {
-        ...initialState,
-        recipes: []
+        recipes: [],
+        doctors: [],
+        cpfMed: []
     }
 
     async componentDidMount() {
@@ -35,24 +30,19 @@ export default class Recipes extends Component {
             .then(res => this.setState({ recipes: res.data }))
 
         const arr = this.state.recipes
+        var cpfMed = arr.map((meds) => {
+            return meds.CPF_MEDICO
+        })
 
-        var meds = arr.map((function (meds) {
-            return JSON.parse(meds.MEDICAMENTO_RECEITA)
-        }))
+        this.setState({ cpfMed: cpfMed })
+    }
 
-        var dos = arr.map((function (dos) {
-            return dos.DOSAGEM
-        }))
-
-        var obs = arr.map((function (obs) {
-            return obs.OBS_RECEITA_PACIENTE
-        }))
-
-        this.setState({ medicaments: meds, dosages: dos, obs: obs })
+    async renderDoc() {
+        await api.get(`/users/${this.state.cpfMed}`)
     }
 
     renderRecipes() {
-        const { recipes, medicaments, dosages, obs } = this.state
+        const { recipes, doctors } = this.state
 
         //const med = `${medicaments}`
         //var medList = med.replace(/,/g, "\n")
@@ -89,11 +79,16 @@ export default class Recipes extends Component {
                 <Swiper style={styles.body} showsButtons={true} key={Math.random()}>
                     {recipes.map((meds) => (
                         <View key={Math.random()}>
-                            <View style={{flexDirection: 'row', marginBottom: 20}}>
-                                <Text style={styles.title}>Vencimento da Receita:</Text>
-                                <Text key={Math.random()} style={styles.title}>
-                                    {moment(meds.DATA_RECEITA).locale('pt-br').format('DD/MM/YYYY')}
-                                    </Text>
+                            <View style={{ flexDirection: 'row', marginBottom: 16, alignItems: 'center' }}>
+                                <Text style={[styles.title]}>Status da Receita:</Text>
+                                <Text key={Math.random()}
+                                    style={[styles.status, meds.STATUS_RECEITA === 'Disponível' ? {} : {
+                                    fontWeight: 'bold',
+                                    color: '#FFFFFF',
+                                    fontSize: 15,
+                                    backgroundColor: 'red',
+                                    padding: 4}
+                                ]}>{meds.STATUS_RECEITA}</Text>
                             </View>
                             <View>
                                 <Text style={styles.title}>Medicamentos:</Text>
@@ -113,11 +108,16 @@ export default class Recipes extends Component {
                                     <Text key={Math.random()}>{meds.OBS_RECEITA_PACIENTE}</Text>
                                 </ScrollView>
                             </View>
+                            <View style={{ flexDirection: 'row', marginVertical: 20 }}>
+                                <Text style={styles.title}>Vencimento da Receita:</Text>
+                                <Text key={Math.random()} style={styles.title}>
+                                    {moment(meds.DATA_RECEITA).locale('pt-br').format('DD/MM/YYYY')}
+                                </Text>
+                            </View>
                         </View>
                     ))}
                 </Swiper >
             </View>
-
         )
 
     }
@@ -146,7 +146,7 @@ export default class Recipes extends Component {
 }
 
 const styles = StyleSheet.create({
-    wrapper: {},
+    //wrapper: {},
     container: {
         flex: 1
     },
@@ -166,6 +166,13 @@ const styles = StyleSheet.create({
         color: commonStyles.colors.primary,
         marginHorizontal: 16,
         fontSize: 15
+    },
+    status: {
+        fontWeight: 'bold',
+        color: '#FFFFFF',
+        fontSize: 15,
+        backgroundColor: commonStyles.colors.primary,
+        padding: 4
     },
     emptyData: {
         fontSize: 18,
