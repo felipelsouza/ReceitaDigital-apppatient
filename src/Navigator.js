@@ -5,6 +5,7 @@ import Pharmacies from './screens/Pharmacies'
 import Recipes from './screens/Recipes'
 import Login from './screens/Login'
 import Register from './screens/Register'
+import Profile from './screens/Profile'
 
 const mainRoutes = {
     Home: {
@@ -26,6 +27,10 @@ const mainRoutes = {
     Register: {
         name: 'Register',
         screen: Register
+    },
+    Profile:{
+        name: 'Profile',
+        screen: Profile
     }
 }
 
