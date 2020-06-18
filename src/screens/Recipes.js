@@ -28,26 +28,29 @@ export default class Recipes extends Component {
     async componentDidMount() {
         await api.get('/receitasPaciente/88888888888')
             .then(res => this.setState({ recipes: res.data }))
-
         const arr = this.state.recipes
-        var cpfMed = arr.map((meds) => {
-            return meds.CPF_MEDICO
+        var cpfMed = arr.map((cpf) => {
+            return cpf.CPF_MEDICO
         })
 
         this.setState({ cpfMed: cpfMed })
+        this.getDoctorsInfo()
     }
 
-    async renderDoc() {
-        await api.get(`/users/${this.state.cpfMed}`)
+    getDoctorsInfo() {
+        const arr = this.state.cpfMed
+        var doctors = arr.map((cpf) => {
+            return this.loadDoctors(cpf)
+        })
+    }
+
+    async loadDoctors(cpf) {
+        await api.get(`/users/${cpf}`)
+            .then(res => this.setState({ doctors: res.data }))
     }
 
     renderRecipes() {
         const { recipes, doctors } = this.state
-
-        //const med = `${medicaments}`
-        //var medList = med.replace(/,/g, "\n")
-
-        //console.log(medList)
 
         if (recipes.length === 0) {
             return (
@@ -75,49 +78,56 @@ export default class Recipes extends Component {
         }
 
         return (
-            <View style={{ flex: 4 }}>
-                <Swiper style={styles.body} showsButtons={true} key={Math.random()}>
-                    {recipes.map((meds) => (
-                        <View key={Math.random()}>
-                            <View style={{ flexDirection: 'row', marginBottom: 16, alignItems: 'center' }}>
-                                <Text style={[styles.title]}>Status da Receita:</Text>
-                                <Text key={Math.random()}
-                                    style={[styles.status, meds.STATUS_RECEITA === 'Disponível' ? {} : {
-                                    fontWeight: 'bold',
-                                    color: '#FFFFFF',
-                                    fontSize: 15,
-                                    backgroundColor: 'red',
-                                    padding: 4}
+            <Swiper style={styles.body} showsButtons={true} key={Math.random()}>
+                {recipes.map((meds) => (
+                    <View key={Math.random()}>
+                        <View style={{ flexDirection: 'row', marginBottom: 16, alignItems: 'center' }}>
+                            <Text style={[styles.title]}>Status da Receita:</Text>
+                            <Text key={Math.random()}
+                                style={[styles.status, meds.STATUS_RECEITA === 'Disponível' ? {} :
+                                    {
+                                        fontWeight: 'bold',
+                                        color: '#FFFFFF',
+                                        fontSize: 15,
+                                        backgroundColor: 'red',
+                                        padding: 4
+                                    }
                                 ]}>{meds.STATUS_RECEITA}</Text>
-                            </View>
-                            <View>
-                                <Text style={styles.title}>Medicamentos:</Text>
-                                <ScrollView style={[styles.textArea, { height: 50 }]}>
-                                    <Text key={Math.random()}>{meds.MEDICAMENTO_RECEITA}</Text>
-                                </ScrollView>
-                            </View>
-                            <View>
-                                <Text style={styles.title}>Dosagens:</Text>
-                                <ScrollView style={[styles.textArea, { height: 80 }]}>
-                                    <Text key={Math.random()}>{meds.DOSAGEM}</Text>
-                                </ScrollView>
-                            </View>
-                            <View>
-                                <Text style={styles.title}>Observações:</Text>
-                                <ScrollView style={[styles.textArea, { height: 80 }]}>
-                                    <Text key={Math.random()}>{meds.OBS_RECEITA_PACIENTE}</Text>
-                                </ScrollView>
-                            </View>
-                            <View style={{ flexDirection: 'row', marginVertical: 20 }}>
-                                <Text style={styles.title}>Vencimento da Receita:</Text>
-                                <Text key={Math.random()} style={styles.title}>
-                                    {moment(meds.DATA_RECEITA).locale('pt-br').format('DD/MM/YYYY')}
-                                </Text>
-                            </View>
                         </View>
-                    ))}
-                </Swiper >
-            </View>
+                        <View>
+                            <Text style={styles.title}>Medicamentos:</Text>
+                            <ScrollView style={[styles.textArea, { height: 60 }]}>
+                                <Text key={Math.random()}>{meds.MEDICAMENTO_RECEITA}</Text>
+                            </ScrollView>
+                        </View>
+                        <View>
+                            <Text style={styles.title}>Dosagens:</Text>
+                            <ScrollView style={[styles.textArea, { height: 90 }]}>
+                                <Text key={Math.random()}>{meds.DOSAGEM}</Text>
+                            </ScrollView>
+                        </View>
+                        <View>
+                            <Text style={styles.title}>Observações:</Text>
+                            <ScrollView style={[styles.textArea, { height: 90 }]}>
+                                <Text key={Math.random()}>{meds.OBS_RECEITA_PACIENTE}</Text>
+                            </ScrollView>
+                        </View>
+                        <View style={{ marginVertical: 20 }}>
+                            <Text key={Math.random()} style={[styles.title, {fontSize: 18}]}>
+                                {`Vencimento da Receita: ${moment(meds.DATA_RECEITA).locale('pt-br').format('DD/MM/YYYY')}`}
+                            </Text>
+                        </View>
+                        <View style={{ marginVertical: 15 }}>
+                            {doctors.map((docs) => (
+                                <View key={Math.random()}>
+                                    <Text key={Math.random()} style={[styles.title, {fontSize: 20}]}>{`Dr(a) ${docs.NOME_MEDICO}`}</Text>
+                                    <Text key={Math.random()} style={[styles.title, {fontSize: 18}]}>{`CRM: ${docs.CRM_MEDICO} - ${docs.UF_MEDICO}`}</Text>
+                                </View>
+                            ))}
+                        </View>
+                    </View>
+                ))}
+            </Swiper>
         )
 
     }
@@ -159,7 +169,7 @@ const styles = StyleSheet.create({
     },
     body: {
         //flex: 10,
-        padding: '5%'
+        padding: '6%'
     },
     title: {
         fontWeight: 'bold',
