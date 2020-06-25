@@ -4,14 +4,18 @@ import {
     View,
     StyleSheet,
     ScrollView,
-    TouchableOpacity,
+    Image,
     FlatList
 } from 'react-native'
 
 import Swiper from 'react-native-swiper'
 
+import {Container, Header, Content, Tab, Tabs, Left, Body, Title, Right } from 'native-base';
 import commonStyles from '../commonStyles'
 import Icon from 'react-native-vector-icons/FontAwesome'
+import logo from '../../assets/imgs/logo.png'
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
+import { faChevronLeft } from '@fortawesome/free-solid-svg-icons'
 
 import moment from 'moment'
 import 'moment/locale/pt-br'
@@ -86,7 +90,7 @@ export default class Recipes extends Component {
                             <Text key={Math.random()}
                                 style={[styles.status, meds.STATUS_RECEITA === 'Disponível' ? {} :
                                     {
-                                        fontWeight: 'bold',
+                                        fontFamily: 'Ubuntu-Bold',
                                         color: '#FFFFFF',
                                         fontSize: 15,
                                         backgroundColor: 'red',
@@ -97,19 +101,19 @@ export default class Recipes extends Component {
                         <View>
                             <Text style={styles.title}>Medicamentos:</Text>
                             <ScrollView style={[styles.textArea, { height: 60 }]}>
-                                <Text key={Math.random()}>{meds.MEDICAMENTO_RECEITA}</Text>
+                                <Text style={styles.boxText} key={Math.random()}>{meds.MEDICAMENTO_RECEITA}</Text>
                             </ScrollView>
                         </View>
                         <View>
                             <Text style={styles.title}>Dosagens:</Text>
                             <ScrollView style={[styles.textArea, { height: 90 }]}>
-                                <Text key={Math.random()}>{meds.DOSAGEM}</Text>
+                                <Text style={styles.boxText} key={Math.random()}>{meds.DOSAGEM}</Text>
                             </ScrollView>
                         </View>
                         <View>
                             <Text style={styles.title}>Observações:</Text>
                             <ScrollView style={[styles.textArea, { height: 90 }]}>
-                                <Text key={Math.random()}>{meds.OBS_RECEITA_PACIENTE}</Text>
+                                <Text style={styles.boxText} key={Math.random()}>{meds.OBS_RECEITA_PACIENTE}</Text>
                             </ScrollView>
                         </View>
                         <View style={{ marginVertical: 20 }}>
@@ -134,19 +138,18 @@ export default class Recipes extends Component {
 
     render() {
         const today = moment().locale('pt-br').format('DD/MM/YYYY')
-
         return (
             <View style={styles.container}>
-                <View style={styles.header}>
-                    <TouchableOpacity style={styles.addIcon} activeOpacity={0.8}
-                        onPress={() => this.props.navigation.navigate('Home')}>
-                        <Icon name="angle-left" size={15}
-                            color={commonStyles.colors.secondary}
-                        />
-                    </TouchableOpacity>
-                    <Text style={styles.title}>Receita Digital</Text>
-                    <Text style={styles.title}>{today}</Text>
-                </View>
+                <Header androidStatusBarColor="#1cc391" style={styles.header} hasTabs>
+                    <Left>
+                        <FontAwesomeIcon onPress={() => this.props.navigation.navigate('Home')} style={{color: 'white'}} icon={ faChevronLeft }/>
+                    </Left>
+                    <Body style={{ alignItems: 'center', justifyContent: 'space-between', flexDirection: 'row' }}>
+                        <Image small source={logo} style={styles.logo} />
+                        <Title style={styles.name}>Samuel</Title>
+                    </Body>
+
+                </Header>
                 <View style={{ height: '90%' }}>
                     {this.renderRecipes()}
                 </View>
@@ -160,25 +163,33 @@ const styles = StyleSheet.create({
     container: {
         flex: 1
     },
-    header: {
-        flexDirection: 'row',
-        padding: 15,
-        borderBottomWidth: 1,
-        borderColor: commonStyles.colors.primaryDark,
-        justifyContent: 'space-between'
+    header: { 
+        backgroundColor: "#1cc391",
+    },
+    logo: {
+        marginLeft: 35,
+        width: 40,
+        height: 40,
+    },
+    name: {
+        paddingRight: 130,
+        fontFamily: 'Ubuntu-Medium',
     },
     body: {
         //flex: 10,
         padding: '6%'
     },
     title: {
-        fontWeight: 'bold',
+        fontFamily: 'Ubuntu-Bold',
         color: commonStyles.colors.primary,
         marginHorizontal: 16,
         fontSize: 15
     },
+    boxText: {
+        fontFamily: 'Ubuntu-Light',
+    },
     status: {
-        fontWeight: 'bold',
+        fontFamily: 'Ubuntu-Bold',
         color: '#FFFFFF',
         fontSize: 15,
         backgroundColor: commonStyles.colors.primary,
@@ -187,7 +198,7 @@ const styles = StyleSheet.create({
     emptyData: {
         fontSize: 18,
         color: commonStyles.colors.primaryDark,
-        fontWeight: 'bold'
+        fontFamily: 'Ubuntu-Bold',
     },
     addIcon: {
         flexDirection: 'row',
@@ -199,6 +210,7 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     textArea: {
+        fontFamily: 'Ubuntu-Light',
         borderWidth: 1,
         borderColor: commonStyles.colors.primary,
         borderRadius: 10,

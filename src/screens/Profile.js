@@ -2,34 +2,65 @@ import React, { Component } from 'react'
 import {
     View,
     Text,
-    ImageBackground,
+    FlatList,
     StyleSheet,
     TouchableOpacity,
     Image,
     Button
 } from 'react-native'
-import { BottomNavigator, SwipperBox } from './components'
 import { HomeContainer } from './components/Profile/styled'
 
-import { Container, Header, Content, Tab, Tabs, Left, Body, Title, Right } from 'native-base';
-
-import commonStyles from '../commonStyles'
+import { Header, Left, Right, Content } from 'native-base';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons'
 import { faBell } from '@fortawesome/free-solid-svg-icons'
 import logo from '../../assets/imgs/logo.png'
+import api from '../services/api'
 
 import moment from 'moment'
 import 'moment/locale/pt-br'
 
-export default class Home extends Component {
+export default class Profile extends Component {
+
+    async componentDidMount() {
+        await api.get('/receitasPaciente/')
+            .then(res => this.setState({ items: res.data }))
+        const arr = this.state.items
+        var items = arr.map(function (prods) {
+            return prods
+        })
+        console.log(items)
+        console.log(items.length)
+        this.setState({data: items})
+    }   
+    state = {
+        data: []
+    }
+
+    renderItem() {
+        const { data } = this.state
+        let qtd = data.length.toString()
+        return (
+            <View>
+                <Text style={styles.name}>Samuel Ximenes</Text>
+                <View style={styles.row}>
+                    <Text style={styles.info}>Receitas            </Text>
+                    <Text style={styles.info}>Avaliações</Text>
+                </View>
+                <View style={styles.row2}>
+                    <Text style={styles.description}>     {qtd}                 </Text>
+                    <Text style={styles.description}>5</Text>
+                </View>
+            </View>
+        )
+    }
+
     render() {
-        const name = 'Samuel'
         return (
             <HomeContainer >
                 <Header androidStatusBarColor="#1cc391" style={styles.header2}>
                 <Left style={styles.left}>
-                    <FontAwesomeIcon style={styles.icon} icon={ faChevronLeft }/>
+                    <FontAwesomeIcon onPress={() => this.props.navigation.navigate('Home')} style={styles.icon} icon={ faChevronLeft }/>
                 </Left>
                 <Right style={styles.right}>
                     <FontAwesomeIcon style={styles.icon2} icon={ faBell }/>
@@ -41,22 +72,7 @@ export default class Home extends Component {
                     <Image style={styles.avatar} source={{ uri: 'https://bootdey.com/img/Content/avatar/avatar6.png' }} />
                     <View style={styles.body}>
                         <View style={styles.bodyContent}>
-                            <Text style={styles.name}>Samuel Ximenes</Text>
-                            <View style={styles.row}>
-                                <Text style={styles.info}>Receitas            </Text>
-                                <Text style={styles.info}>Avaliações</Text>
-                            </View>
-                            <View style={styles.row2}>
-                                <Text style={styles.description}>5                 </Text>
-                                <Text style={styles.description}>5</Text>
-                            </View>
-
-                            {/* <TouchableOpacity style={styles.buttonContainer}>
-                                <Text style={{fontFamily: 'Ubuntu-Medium'}}>Opcion 1</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={styles.buttonContainer}>
-                                <Text style={{fontFamily: 'Ubuntu-Medium'}}>Opcion 2</Text>
-                            </TouchableOpacity> */}
+                            {this.renderItem()}
                         </View>
                     </View>
                 </View>
