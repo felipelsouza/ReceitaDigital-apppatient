@@ -30,7 +30,7 @@ export default class Recipes extends Component {
     }
 
     async componentDidMount() {
-        await api.get('/receitasPaciente/88888888888')
+        await api.get('/receitasPaciente/')
             .then(res => this.setState({ recipes: res.data }))
         const arr = this.state.recipes
         var cpfMed = arr.map((cpf) => {

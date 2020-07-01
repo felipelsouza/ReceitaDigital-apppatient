@@ -75,6 +75,10 @@ export default class Profile extends Component {
                             {this.renderItem()}
                         </View>
                     </View>
+                    <Button
+                        style={styles.buttonContainer}
+                        title="Learn More"
+                    />
                 </View>
             </HomeContainer>
         )
@@ -132,6 +136,17 @@ const styles = StyleSheet.create({
         position: 'absolute',
         marginTop: 130
     },
+    buttonContainer: {
+        marginTop: 10,
+        height: 45,
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 20,
+        width: 10,
+        borderRadius: 30,
+        backgroundColor: "white",
+    },
     name: {
         fontFamily: 'Ubuntu-Medium',
         fontSize: 22,
@@ -165,16 +180,5 @@ const styles = StyleSheet.create({
         color: "#696969",
         marginTop: 10,
         textAlign: 'center'
-    },
-    buttonContainer: {
-        marginTop: 10,
-        height: 45,
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginBottom: 20,
-        width: 250,
-        borderRadius: 30,
-        backgroundColor: "white",
     },
 })
